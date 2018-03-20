@@ -7,6 +7,7 @@ import java.util.Scanner;
 public class CsvReader {
     private String filename;
     private Scanner inputStream;
+    public String[] enteteFichier;
 
     public CsvReader(String Filename){
         this.filename = Filename;
@@ -18,30 +19,28 @@ public class CsvReader {
         }
     }
 
-    public String[] getHeader(){
+    public void getHeader() {
         String completeEntete;
         completeEntete = inputStream.next();
         String[] entete;
         entete = completeEntete.split(",");
         System.out.println("Entete  = " + completeEntete);
-        DbDonateur.createTable(entete);
-        return entete;
+        this.enteteFichier = entete;
     }
 
     public String[] readFromFile(){
         String data;
-        data = inputStream.next();
         String[] values = new String[0];
         while (inputStream.hasNext()){
             data = inputStream.next();
             values = data.split(",");
-            for (String valeur : values){
-                System.out.print(valeur+"||");
-            }
-            System.out.println();
             DbDonateur.insertTuple(values);
         }
         inputStream.close();
         return values;
+    }
+
+    public String[] getEnteteFichier() {
+        return this.enteteFichier;
     }
 }

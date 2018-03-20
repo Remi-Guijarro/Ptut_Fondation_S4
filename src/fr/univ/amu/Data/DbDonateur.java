@@ -15,7 +15,7 @@ public class DbDonateur {
             e.printStackTrace();
         }
         if (connection != null){
-            System.out.println("Connecté à la base de donnée Donateurs");
+            System.out.println("\tConnecté à la base de donnée Donateurs\t\n");
         }
     }
 
@@ -27,8 +27,9 @@ public class DbDonateur {
             }
             String concatQuery = query.substring(0, query.length() - 2);
             concatQuery += ")";
-            System.out.println(concatQuery);
+            //System.out.println(concatQuery);
             connection.createStatement().execute(concatQuery);
+            System.out.println("\ttable Donateurs crée\t\n");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -42,22 +43,26 @@ public class DbDonateur {
             }
             String concatQuery = query.substring(0, query.length() - 2);
             concatQuery += ")";
-            System.out.println(concatQuery);
+            //System.out.println(concatQuery);
             connection.createStatement().execute(concatQuery);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public static void displayAll(){
+    public static void displayAll(String[] ArrayEntete) {
         try {
             String query = "SELECT * FROM Donateurs";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
+            System.out.println("\tAffichage des tuples :\t\n");
             while (resultSet.next()){
-                System.out.println(resultSet.getString("CODE") + "  " + resultSet.getString("VILLE") + "  " + resultSet.getString("MONEY"));
+                for (String data : ArrayEntete) {
+                    System.out.print(resultSet.getString(data) + " ");
+                }
+                System.out.println();
             }
-            System.out.println("terminé");
+            System.out.println("\tterminé\t\n");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -68,6 +73,7 @@ public class DbDonateur {
         try {
             Statement statementSuppr = connection.createStatement();
             statementSuppr.execute(querySuppr);
+            System.out.println("\tTable détruite\t\n");
         } catch (SQLException e) {
             e.printStackTrace();
         }
