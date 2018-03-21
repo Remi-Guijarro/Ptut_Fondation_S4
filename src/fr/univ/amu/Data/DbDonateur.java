@@ -36,17 +36,23 @@ public class DbDonateur {
     }
 
     public static void insertTuple(String[] arrayDonateurs){
-        try {
-            String query = "INSERT INTO Donateurs VALUES( ";
-            for (String mot : arrayDonateurs){
+        String query = "INSERT INTO Donateurs VALUES(";
+        for (String mot : arrayDonateurs) {
+            if (mot == "" || mot == " ") {
+                query += "'" + "NULL" + "'" + " ,";
+            } else {
                 query += "'"+mot+"'" + " ,";
             }
-            String concatQuery = query.substring(0, query.length() - 2);
-            concatQuery += ")";
-            //System.out.println(concatQuery);
-            connection.createStatement().execute(concatQuery);
-        } catch (SQLException e) {
-            e.printStackTrace();
+
+        }
+        String concatQuery = query.substring(0, query.length() - 2);
+        concatQuery += ")";
+        //System.out.println(concatQuery);
+        if (concatQuery != "''") {
+            try {
+                connection.createStatement().execute(concatQuery);
+            } catch (SQLException e) {
+            }
         }
     }
 

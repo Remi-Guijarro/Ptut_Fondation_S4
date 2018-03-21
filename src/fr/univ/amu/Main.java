@@ -2,6 +2,7 @@ package fr.univ.amu;
 
 import fr.univ.amu.Data.CsvReader;
 import fr.univ.amu.Data.DbDonateur;
+import fr.univ.amu.Network_Call.Geocodeur;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -28,7 +29,7 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         DbDonateur.GetConnected();
-        CsvReader csvReader = new CsvReader("/home/remi/IdeaProjects/GeolocalisationDonS4/src/fr/univ/amu/ressources/data.csv");
+        CsvReader csvReader = new CsvReader("src/fr/univ/amu/ressources/data.csv");
         csvReader.getHeader();
         DbDonateur.createTable(csvReader.getEnteteFichier());
         //System.out.println(csvReader.getEnteteFichier());
@@ -38,6 +39,7 @@ public class Main extends Application {
         //DbAdrToGPS.createTable();
         //DbAdrToGPS.insertTuple("45 avenue du sangloer , 21600 Une ville en France","1.5678","3.7654");
         //DbAdrToGPS.displayAll();
+        Geocodeur.getCoordonéeFromAdr(" La ciotat");
         launch(args);
     }
 
