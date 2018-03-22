@@ -43,7 +43,7 @@ public class Main extends Application {
         //DbAdrToGPS.insertTuple("45 avenue du sangloer , 21600 Une ville en France","1.5678","3.7654"); //exemple d'insertion d'un tuple dans la base de données des coordonées
         //DbAdrToGPS.displayAll();                                                                       // Afficher tout les tuple de la base de coordonées
         Geocodeur.getCoordonéeFromAdr(" La ciotat");
-        launch(args);
+        launch(args); //test
     }
 
     public void afficherDonateur(double latitude,double longitude,WebEngine engine)
