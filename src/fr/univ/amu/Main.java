@@ -4,12 +4,14 @@ import fr.univ.amu.Data.CsvReader;
 import fr.univ.amu.Data.DbDonateur;
 import fr.univ.amu.Displayed_Object.Carte;
 import fr.univ.amu.Network_Call.Geocodeur;
+import fr.univ.amu.Object_Structure.Coordonée;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -24,31 +26,36 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.Map;
 
 public class Main extends Application {
 
     public static void main(String[] args) {
-        DbDonateur.GetConnected();                                                                      // Connection a la base de de donnée
+        DbDonateur.GetConnected();                                                                      // Connexion a la base de de donnée
         CsvReader csvReader = new CsvReader("src/fr/univ/amu/ressources/data.csv");            //Déclaration du CSVReader avec l'adresse relative du fichier CSV
         csvReader.getHeader();                                                                          // rempli l'entete du fichier avec l'entete du fichier
         DbDonateur.createTable(csvReader.getEnteteFichier());                                           // Creer la table SQL a partir de l'entete du fichier
         //System.out.println(csvReader.getEnteteFichier());                                             // permet de recuperer l'entete du fichier CSV
         csvReader.readFromFile();                                                                       // inséré des tuple dans la base a partir du fichier CSV
         DbDonateur.displayAll(csvReader.getEnteteFichier());                                            // Afficher le contenue de la base
-        //DbAdrToGPS.GetConnected();                                                                    // Conection à la base de donnée des coordonées
+        //DbAdrToGPS.GetConnected();                                                                    // Connexion à la base de donnée des coordonées
         //DbAdrToGPS.createTable();                                                                     // Création de la table de Coordonéé pas besoin de relancer la ligne si tu le fait une fois la table est créer meme si tu ferme l'appli
 
         //DbAdrToGPS.insertTuple("45 avenue du sangloer , 21600 Une ville en France","1.5678","3.7654"); //exemple d'insertion d'un tuple dans la base de données des coordonées
         //DbAdrToGPS.displayAll();                                                                       // Afficher tout les tuple de la base de coordonées
-        Geocodeur.getCoordonéeFromAdr(" La ciotat");
-        launch(args); //test
+        Geocodeur.getCoordonéeFromAdr("La Ciotat");
+        launch(args);
     }
 
     public void afficherDonateur(double latitude,double longitude,WebEngine engine)
     {
         engine.executeScript("document.placeMarkerDB("+latitude+","+longitude+")");                     // Appel de la fonction qui permet d'ajouter des marker
+    }
+
+    public void removeDonateur(/*double latitude, double longitude,*/ WebEngine engine) {
+        engine.executeScript("document.removeMarker()");
     }
 
     public AnchorPane setMap(){ // Fonction qui creé la map et la fixe a l'IHM
@@ -89,7 +96,11 @@ public class Main extends Application {
                         if( newValue != Worker.State.SUCCEEDED ) {
                             return;
                         }
-                        afficherDonateur(48.866667,2.333333,webView.getEngine()); // ON DEMANDE AU SCRIPT D'AFFICHER TOUT LES DONATEURS EN BASE DE DONÉE
+                        //afficherDonateur(48.866667,2.333333,webView.getEngine()); // ON DEMANDE AU SCRIPT D'AFFICHER TOUT LES DONATEURS EN BASE DE DONÉE
+
+                        for(Coordonée coordonée: DbDonateur.getCoordonnees()) {
+                            afficherDonateur(coordonée.getLat(), coordonée.getLongitude(), webView.getEngine());
+                        } // boucle for qui affiche tous les points sur la carte
                     }
                 } );
 
@@ -312,8 +323,10 @@ public class Main extends Application {
         Button validerAll = new Button("Valider");
 
         final Label erreur = new Label(" ");
-        erreur.setTextFill(Color.RED);
+        erreur.setTextFill(Color.WHITE);
         erreur.setAlignment(Pos.CENTER);
+        erreur.setMaxWidth(220);
+        erreur.setStyle("-fx-font-size: 15px");
 
 
         HBox hboxErreur = new HBox(erreur);
@@ -321,6 +334,26 @@ public class Main extends Application {
 
         VBox commands = new VBox(30, textRegion, region, textFiltre, filtreAge, filtreDon, filtreDept, validerAll, hboxErreur);
         HBox horizon = new HBox(commands);
+
+        validerAll.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                String codePostal = dept.getText();
+                if(2 == codePostal.length() || codePostal.length() == 5) {
+                    erreur.setText("Code postal sélectionné\n" + codePostal);
+
+                    DbDonateur.trierParCP(codePostal);
+
+                    //removeDonateur(webView.getEngine());
+                    System.out.println("Supprimer les markeurs et afficher les markeurs corrects");
+
+
+                } else {
+                    erreur.setText("Le code postal doit avoir \nune taille de 2 ou 5 caractères !\nEx: 04 ou 13100");
+                }
+
+            }
+        });
 
 
         commands.setStyle("-fx-background-color: #0d3a6d");

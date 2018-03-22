@@ -16,7 +16,7 @@ import java.util.Scanner;
 public class Geocodeur {
     private String str;
 
-    public static void getCoordonéeFromAdr(String adresse) {
+    public static Coordonée getCoordonéeFromAdr(String adresse) {
         try {
             String adrGeocodeur = "http://photon.komoot.de/api/?q=" + URLEncoder.encode(adresse, "UTF-8");
             try {
@@ -34,7 +34,7 @@ public class Geocodeur {
                 JSONObject loc = res.getJSONObject("geometry");
                 JSONArray coordonne = loc.getJSONArray("coordinates");
                 Coordonée result = new Coordonée(coordonne.getDouble(1), coordonne.getDouble(0));
-                result.display();
+                return result;
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -45,5 +45,6 @@ public class Geocodeur {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        return new Coordonée(0,0);
     }
 }
