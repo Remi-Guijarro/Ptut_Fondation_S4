@@ -3,19 +3,19 @@ package fr.univ.amu.Data;
 import java.sql.*;
 
 public class DbDonateur {
-    private static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
+    private static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";        // INITIALISATION DU DRIVER ACCES A LA BD
     private static final String JDBC_URL = "jdbc:derby:donateurs;create= true";
 
     private static Connection connection;
 
-    public static void GetConnected(){
+    public static void GetConnected(){                                  // FONCTION DE CONNECTION A LA BASE DE DONNÉE
         try {
             connection = DriverManager.getConnection(JDBC_URL);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         if (connection != null){
-            System.out.println("\tConnecté à la base de donnée Donateurs\t\n");
+            //System.out.println("\tConnecté à la base de donnée Donateurs\t\n");
         }
     }
 

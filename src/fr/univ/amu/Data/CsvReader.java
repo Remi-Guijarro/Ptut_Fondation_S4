@@ -9,23 +9,23 @@ public class CsvReader {
     private File csvFile;
     private String[] enteteFichier;
 
-    public CsvReader(String Filename){
+    public CsvReader(String Filename){                          // CONSTRUCTEUR
         this.filename = Filename;
         csvFile = new File(this.filename);
     }
 
-    public void getHeader() {
+    public void getHeader() {                                  // FONCTION QUI LIT LA PREMIERE LIGNE DU CSV ET INITIALISE LA VARIABLE ENTETE FICHIER AVEC LES VALEUR DE LA PREMMIERE LIGNE DU FICHIER
         Scanner scanner = null;
         try {
-            scanner = new Scanner(this.csvFile);
+            scanner = new Scanner(this.csvFile);               // INITIALISATION DU SCANNER ( LECTEUR DE FICHIER )
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        String completeEntete;
-        completeEntete = scanner.next();
+        String ligneLu;
+        ligneLu = scanner.next();
         String[] entete;
-        entete = completeEntete.split(",");
-        System.out.println("Entete  = " + completeEntete);
+        entete = ligneLu.split(",");
+        //System.out.println("Entete  = " + ligneLu);
         this.enteteFichier = entete;
     }
 
@@ -42,13 +42,13 @@ public class CsvReader {
         while (scanner.hasNextLine()) {
             line = scanner.nextLine();
             values = line.split(",");
-            DbDonateur.insertTuple(values);
+            DbDonateur.insertTuple(values);                 // INSERTION DE LA LIGNE DANS LA BASE DE DONÉE
         }
         scanner.close();
         return values;
     }
 
     public String[] getEnteteFichier() {
-        return this.enteteFichier;
+        return this.enteteFichier;                          // RENVOI LA VARIABLE ENTETE DU FICHIER
     }
 }

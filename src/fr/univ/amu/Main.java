@@ -51,7 +51,7 @@ public class Main extends Application {
         engine.executeScript("document.placeMarkerDB("+latitude+","+longitude+")");                     // Appel de la fonction qui permet d'ajouter des marker
     }
 
-    public AnchorPane setMap(){
+    public AnchorPane setMap(){ // Fonction qui creé la map et la fixe a l'IHM
         final WebView webView = new WebView();
         AnchorPane.setTopAnchor(webView, 0d);
         AnchorPane.setLeftAnchor(webView, 0d);
@@ -59,12 +59,16 @@ public class Main extends Application {
         AnchorPane.setRightAnchor(webView, 0d);
         final Button zoomInButton = new Button("+");
         zoomInButton.setDisable(true);
-        zoomInButton.setStyle("-fx-background-radius: 20, 19, 18, 17;");
+        zoomInButton.setStyle("-fx-background-radius: 20, 19, 18, 17;" +
+                "-fx-background-color: #0d3a6d;");
+        zoomInButton.setTextFill(Paint.valueOf("white"));
         zoomInButton.setPrefSize(28, 28);
         zoomInButton.setOnAction(actionEvent -> webView.getEngine().executeScript("document.zoomIn();"));
         final Button zoomOutButton = new Button("-");
         zoomOutButton.setDisable(true);
-        zoomOutButton.setStyle("-fx-background-radius: 20, 19, 18, 17;");
+        zoomOutButton.setStyle("-fx-background-radius: 20, 19, 18, 17;" +
+                "-fx-background-color: #0d3a6d;");
+        zoomOutButton.setTextFill(Paint.valueOf("white"));
         zoomOutButton.setPrefSize(28, 28);
         zoomOutButton.setOnAction(actionEvent -> webView.getEngine().executeScript("document.zoomOut();"));
         final VBox leftControls = new VBox(zoomInButton, zoomOutButton);
@@ -73,12 +77,22 @@ public class Main extends Application {
         AnchorPane.setLeftAnchor(leftControls, 6d);
         final AnchorPane root = new AnchorPane();
         root.getChildren().setAll(webView,leftControls);
-        webView.getEngine().getLoadWorker().stateProperty().addListener(
+
+
+        webView.getEngine().getLoadWorker().stateProperty().addListener( // EXECUTER UN SCRIPT UNIQUEMENT SI LA WEBVIEW A FINI DE CHARGER SINON IL NE DETECTE PAS LA FONCTION
                 new ChangeListener<Worker.State>() {
-                    public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
-                                afficherDonateur(48.866667,2.333333,webView.getEngine());
+                    @Override
+                    public void changed(
+                            ObservableValue<? extends Worker.State> observable,
+                            Worker.State oldValue, Worker.State newValue ) {
+
+                        if( newValue != Worker.State.SUCCEEDED ) {
+                            return;
                         }
-                    });
+                        afficherDonateur(48.866667,2.333333,webView.getEngine()); // ON DEMANDE AU SCRIPT D'AFFICHER TOUT LES DONATEURS EN BASE DE DONÉE
+                    }
+                } );
+
         webView.getEngine().getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observableValue, Worker.State oldValue, Worker.State newValue) -> {
             final boolean disabled = newValue != Worker.State.SUCCEEDED;
             zoomInButton.setDisable(disabled);
