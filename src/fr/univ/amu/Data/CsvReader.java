@@ -21,7 +21,7 @@ public class CsvReader {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        String ligneLu;
+        String ligneLu; // ligne lu
         ligneLu = scanner.next();
         String[] entete;
         entete = ligneLu.split(",");
