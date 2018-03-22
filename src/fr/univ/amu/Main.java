@@ -2,8 +2,12 @@ package fr.univ.amu;
 
 import fr.univ.amu.Data.CsvReader;
 import fr.univ.amu.Data.DbDonateur;
+import fr.univ.amu.Displayed_Object.Carte;
 import fr.univ.amu.Network_Call.Geocodeur;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -12,10 +16,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.web.WebEngine;
@@ -24,28 +25,72 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.File;
+import java.util.Map;
 
 public class Main extends Application {
 
     public static void main(String[] args) {
-        DbDonateur.GetConnected();
-        CsvReader csvReader = new CsvReader("src/fr/univ/amu/ressources/data.csv");
-        csvReader.getHeader();
-        DbDonateur.createTable(csvReader.getEnteteFichier());
-        //System.out.println(csvReader.getEnteteFichier());
-        csvReader.readFromFile();
-        DbDonateur.displayAll(csvReader.getEnteteFichier());
-        //DbAdrToGPS.GetConnected();
-        //DbAdrToGPS.createTable();
-        //DbAdrToGPS.insertTuple("45 avenue du sangloer , 21600 Une ville en France","1.5678","3.7654");
-        //DbAdrToGPS.displayAll();
+        DbDonateur.GetConnected();                                                                      // Connection a la base de de donnée
+        CsvReader csvReader = new CsvReader("src/fr/univ/amu/ressources/data.csv");            //Déclaration du CSVReader avec l'adresse relative du fichier CSV
+        csvReader.getHeader();                                                                          // rempli l'entete du fichier avec l'entete du fichier
+        DbDonateur.createTable(csvReader.getEnteteFichier());                                           // Creer la table SQL a partir de l'entete du fichier
+        //System.out.println(csvReader.getEnteteFichier());                                             // permet de recuperer l'entete du fichier CSV
+        csvReader.readFromFile();                                                                       // inséré des tuple dans la base a partir du fichier CSV
+        DbDonateur.displayAll(csvReader.getEnteteFichier());                                            // Afficher le contenue de la base
+        //DbAdrToGPS.GetConnected();                                                                    // Conection à la base de donnée des coordonées
+        //DbAdrToGPS.createTable();                                                                     // Création de la table de Coordonéé pas besoin de relancer la ligne si tu le fait une fois la table est créer meme si tu ferme l'appli
+
+        //DbAdrToGPS.insertTuple("45 avenue du sangloer , 21600 Une ville en France","1.5678","3.7654"); //exemple d'insertion d'un tuple dans la base de données des coordonées
+        //DbAdrToGPS.displayAll();                                                                       // Afficher tout les tuple de la base de coordonées
         Geocodeur.getCoordonéeFromAdr(" La ciotat");
         launch(args);
     }
 
+    public void afficherDonateur(double latitude,double longitude,WebEngine engine)
+    {
+        engine.executeScript("document.placeMarkerDB("+latitude+","+longitude+")");                     // Appel de la fonction qui permet d'ajouter des marker
+    }
+
+    public AnchorPane setMap(){
+        final WebView webView = new WebView();
+        AnchorPane.setTopAnchor(webView, 0d);
+        AnchorPane.setLeftAnchor(webView, 0d);
+        AnchorPane.setBottomAnchor(webView, 0d);
+        AnchorPane.setRightAnchor(webView, 0d);
+        final Button zoomInButton = new Button("+");
+        zoomInButton.setDisable(true);
+        zoomInButton.setStyle("-fx-background-radius: 20, 19, 18, 17;");
+        zoomInButton.setPrefSize(28, 28);
+        zoomInButton.setOnAction(actionEvent -> webView.getEngine().executeScript("document.zoomIn();"));
+        final Button zoomOutButton = new Button("-");
+        zoomOutButton.setDisable(true);
+        zoomOutButton.setStyle("-fx-background-radius: 20, 19, 18, 17;");
+        zoomOutButton.setPrefSize(28, 28);
+        zoomOutButton.setOnAction(actionEvent -> webView.getEngine().executeScript("document.zoomOut();"));
+        final VBox leftControls = new VBox(zoomInButton, zoomOutButton);
+        leftControls.setSpacing(6);
+        AnchorPane.setTopAnchor(leftControls, 50d);
+        AnchorPane.setLeftAnchor(leftControls, 6d);
+        final AnchorPane root = new AnchorPane();
+        root.getChildren().setAll(webView,leftControls);
+        webView.getEngine().getLoadWorker().stateProperty().addListener(
+                new ChangeListener<Worker.State>() {
+                    public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
+                                afficherDonateur(48.866667,2.333333,webView.getEngine());
+                        }
+                    });
+        webView.getEngine().getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observableValue, Worker.State oldValue, Worker.State newValue) -> {
+            final boolean disabled = newValue != Worker.State.SUCCEEDED;
+            zoomInButton.setDisable(disabled);
+            zoomOutButton.setDisable(disabled);
+        });
+        webView.getEngine().load(new Carte().getSource());
+        return root;
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Gestion Donateurs");
 
         final WebView webView = new WebView();
@@ -59,8 +104,9 @@ public class Main extends Application {
         AnchorPane.setBottomAnchor(webView, 0d);
         AnchorPane.setRightAnchor(webView, 0d);
 
-        // Barre sur la gauche de l'écran : zoom.
-        /*final Button zoomInButton = new Button("+");
+
+        //Barre sur la gauche de l'écran : zoom.
+        final Button zoomInButton = new Button("+");
         zoomInButton.setDisable(true);
         zoomInButton.setStyle("-fx-background-radius: 20, 19, 18, 17;");
         zoomInButton.setPrefSize(28, 28);
@@ -73,20 +119,11 @@ public class Main extends Application {
         final VBox leftControls = new VBox(zoomInButton, zoomOutButton);
         leftControls.setSpacing(6);
         AnchorPane.setTopAnchor(leftControls, 50d);
-        AnchorPane.setLeftAnchor(leftControls, 6d);*/
-
+        AnchorPane.setLeftAnchor(leftControls, 6d);
 
         // Assemblage.
-       /* final AnchorPane rooty = new AnchorPane();
-        rooty.getChildren().setAll(webView,leftControls);
-
-        webView.getEngine().getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observableValue, Worker.State oldValue, Worker.State newValue) -> {
-            final boolean disabled = newValue != Worker.State.SUCCEEDED;
-            zoomInButton.setDisable(disabled);
-            zoomOutButton.setDisable(disabled);
-        });*/
-
-        //webView.getEngine().load(carte.getSource());
+       final AnchorPane rooty = new AnchorPane();
+        rooty.getChildren().setAll(webView);
 
         final BorderPane background = new BorderPane();
 
@@ -275,12 +312,12 @@ public class Main extends Application {
         commands.setStyle("-fx-background-color: #0d3a6d");
         commands.setPadding(new Insets(20, 50, 5, 50));
 
-
-        background.setCenter(horizon);
+        background.setCenter(rooty);
+        background.setRight(horizon);
         background.setTop(menuBar);
         menuBar.setStyle("-fx-background-color: #0d3a6d");
 
-
+        background.setCenter(setMap());
         background.setRight(commands);
 
 

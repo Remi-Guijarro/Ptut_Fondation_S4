@@ -2,29 +2,27 @@ package fr.univ.amu.Data;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class CsvReader {
     private String filename;
-    private Scanner inputStream;
+    private File csvFile;
     private String[] enteteFichier;
-    private ArrayList<String> query;
 
     public CsvReader(String Filename){
         this.filename = Filename;
-        File file = new File(this.filename);
-        this.query = new ArrayList<String>();
-        try{
-            this.inputStream = new Scanner(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        csvFile = new File(this.filename);
     }
 
     public void getHeader() {
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(this.csvFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         String completeEntete;
-        completeEntete = inputStream.next();
+        completeEntete = scanner.next();
         String[] entete;
         entete = completeEntete.split(",");
         System.out.println("Entete  = " + completeEntete);
@@ -32,15 +30,21 @@ public class CsvReader {
     }
 
     public String[] readFromFile(){
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(this.csvFile);
+            scanner.nextLine();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         String line;
         String[] values = null;
-        while (inputStream.hasNextLine()) {
-            line = inputStream.nextLine();
+        while (scanner.hasNextLine()) {
+            line = scanner.nextLine();
             values = line.split(",");
-            //  System.out.println(values.toString());
             DbDonateur.insertTuple(values);
         }
-        inputStream.close();
+        scanner.close();
         return values;
     }
 
