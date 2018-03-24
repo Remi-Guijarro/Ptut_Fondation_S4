@@ -81,7 +81,7 @@ public class DbDonateur {
         try {
             String query = "SELECT ADR3, CPOST, VILLE FROM Donateurs";
             Statement statement = connection.createStatement();
-            ResultSet resultSet = null;
+            ResultSet resultSet = statement.executeQuery(query);
             ArrayList<String> adresses = new ArrayList<String>();
             while (resultSet.next()){
                 adresses.add(resultSet.getString("ADR3")+" " + resultSet.getString("CPOST") + " " + resultSet.getString("VILLE"));
