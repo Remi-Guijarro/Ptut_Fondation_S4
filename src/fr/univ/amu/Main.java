@@ -1,6 +1,7 @@
 package fr.univ.amu;
 
 import fr.univ.amu.Data.CsvReader;
+import fr.univ.amu.Data.DbAdrToGPS;
 import fr.univ.amu.Data.DbDonateur;
 import fr.univ.amu.Displayed_Object.Carte;
 import fr.univ.amu.Network_Call.Geocodeur;
@@ -40,13 +41,13 @@ public class Main extends Application {
         //System.out.println(csvReader.getEnteteFichier());                                             // permet de recuperer l'entete du fichier CSV
         csvReader.readFromFile();                                                                       // inséré des tuple dans la base a partir du fichier CSV
         DbDonateur.displayAll(csvReader.getEnteteFichier());                                            // Afficher le contenue de la base
-        //DbAdrToGPS.GetConnected();                                                                    // Connexion à la base de donnée des coordonées
+        DbAdrToGPS.GetConnected();                                                                    // Connexion à la base de donnée des coordonées
         //DbAdrToGPS.createTable();                                                                     // Création de la table de Coordonéé pas besoin de relancer la ligne si tu le fait une fois la table est créer meme si tu ferme l'appli
 
         //DbAdrToGPS.insertTuple("45 avenue du sangloer , 21600 Une ville en France","1.5678","3.7654"); //exemple d'insertion d'un tuple dans la base de données des coordonées
         //DbAdrToGPS.displayAll();                                                                       // Afficher tout les tuple de la base de coordonées
-        Geocodeur.getCoordonéeFromAdr("La Ciotat");
-        launch(args);
+       // Geocodeur.getCoordonéeFromAdr("La Ciotat");
+       launch(args);
     }
 
     public void afficherDonateur(double latitude,double longitude,WebEngine engine)
@@ -54,7 +55,7 @@ public class Main extends Application {
         engine.executeScript("document.placeMarkerDB("+latitude+","+longitude+")");                     // Appel de la fonction qui permet d'ajouter des marker
     }
 
-    public void removeDonateur(/*double latitude, double longitude,*/ WebEngine engine) {
+    public void removeDonateur( WebEngine engine) {
         engine.executeScript("document.removeMarker()");
     }
 
@@ -343,11 +344,23 @@ public class Main extends Application {
                     erreur.setText("Code postal sélectionné\n" + codePostal);
 
                     DbDonateur.trierParCP(codePostal);
+                    webView.getEngine().getLoadWorker().stateProperty().addListener( // EXECUTER UN SCRIPT UNIQUEMENT SI LA WEBVIEW A FINI DE CHARGER SINON IL NE DETECTE PAS LA FONCTION
+                            new ChangeListener<Worker.State>() {
+                                @Override
+                                public void changed(
+                                        ObservableValue<? extends Worker.State> observable,
+                                        Worker.State oldValue, Worker.State newValue ) {
 
-                    //removeDonateur(webView.getEngine());
-                    System.out.println("Supprimer les markeurs et afficher les markeurs corrects");
-
-
+                                    if( newValue != Worker.State.SUCCEEDED ) {
+                                        return;
+                                    }
+                                    removeDonateur(webView.getEngine());
+                                    for(Coordonée coordonée: DbDonateur.getCoordonnees()) {
+                                        afficherDonateur(coordonée.getLat(), coordonée.getLongitude(), webView.getEngine());
+                                    } // boucle for qui affiche tous les points sur la carte
+                                    System.out.println("Supprimer les markeurs et afficher les markeurs corrects");
+                                }
+                            } );
                 } else {
                     erreur.setText("Le code postal doit avoir \nune taille de 2 ou 5 caractères !\nEx: 04 ou 13100");
                 }

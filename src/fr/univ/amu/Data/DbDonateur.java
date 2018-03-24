@@ -77,6 +77,23 @@ public class DbDonateur {
         return new ArrayList<Coordonée>();
     }
 
+    public static ArrayList<String> getAdrs(){
+        try {
+            String query = "SELECT ADR3, CPOST, VILLE FROM Donateurs";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = null;
+            ArrayList<String> adresses = new ArrayList<String>();
+            while (resultSet.next()){
+                adresses.add(resultSet.getString("ADR3")+" " + resultSet.getString("CPOST") + " " + resultSet.getString("VILLE"));
+            }
+            resultSet = statement.executeQuery(query);
+            return adresses;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<String>();
+    }
+
     public static void trierParCP(String codePostal) {
         try {
             String query = "";
