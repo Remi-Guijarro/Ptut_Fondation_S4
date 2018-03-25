@@ -27,6 +27,7 @@ public class CsvReader {
         entete = ligneLu.split(",");
         //System.out.println("Entete  = " + ligneLu);
         this.enteteFichier = entete;
+        DbDonateur.setTailleEntete(entete.length);
     }
 
     public String[] readFromFile(){
@@ -48,7 +49,8 @@ public class CsvReader {
         //DbAdrToGPS.createTable();
         CoordinateInserter.CreeColonnesCoordonnée();
         CoordinateInserter.getAndInsertGPS(DbDonateur.getAdrs());
-        DbAdrToGPS.displayAll();
+        //DbAdrToGPS.displayAll();
+       // DbDonateur.displayAll(enteteFichier);
         scanner.close();
         return values;
     }

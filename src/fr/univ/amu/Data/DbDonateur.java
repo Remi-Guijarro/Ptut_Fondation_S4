@@ -3,6 +3,8 @@ package fr.univ.amu.Data;
 import fr.univ.amu.Network_Call.Geocodeur;
 import fr.univ.amu.Object_Structure.Address;
 import fr.univ.amu.Object_Structure.Coordonée;
+import fr.univ.amu.Object_Structure.JsCaller;
+import javafx.scene.web.WebEngine;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import java.util.Map;
 public class DbDonateur {
     private static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";        // INITIALISATION DU DRIVER ACCES A LA BD
     private static final String JDBC_URL = "jdbc:derby:donateurs;create= true";
+    public static  int tailleEntete;
 
     private static Connection connection;
 
@@ -64,6 +67,10 @@ public class DbDonateur {
         }
     }
 
+    public static void setTailleEntete(int taille){
+        tailleEntete = taille;
+    }
+
     public static void modifyLatLong(Double lat, Double longitudes, Address elementAdresse){
         String query = "UPDATE Donateurs SET Latitudes = "+"'"+lat+"'"+", Longitudes = "+"'"+longitudes+"'"+"WHERE ADR3 = " + "'" + elementAdresse.getAdr() + "'" +
         " AND CPOST = " + "'" + elementAdresse.getCodePostal() + "'" + " AND VILLE = " + "'" + elementAdresse.getVille() + "'";
@@ -75,13 +82,14 @@ public class DbDonateur {
         }
     }
 
-    public static List<Coordonée> getCoordonnees() {
+    public static ArrayList<Coordonée> getCoordonnees() {
         try {
-            String query = "SELECT Latitudes, Longitudes FROM Donateurs";
+            String query = "SELECT * FROM Donateurs";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-            List<Coordonée> lesCoordonnées = new ArrayList<Coordonée>();
+            ArrayList<Coordonée> lesCoordonnées = new ArrayList<Coordonée>();
             while (resultSet.next()){
+                System.out.println("jajoute ici");
                  lesCoordonnées.add(new Coordonée(Double.parseDouble(resultSet.getString("Latitudes")), Double.parseDouble(resultSet.getString("Longitudes"))));
             }
             return lesCoordonnées;
@@ -145,24 +153,24 @@ public class DbDonateur {
         }
     }
 
-    public static void displayAll(String[] ArrayEntete) {
+    public static ArrayList<String> getALL(WebEngine engine) {
+        ArrayList <String> arrayList = new ArrayList<String>();
         try {
             String query = "SELECT * FROM Donateurs";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             System.out.println("\tAffichage des tuples :\t\n");
+            int i = 0;
             while (resultSet.next()){
-                Geocodeur.getCoordonéeFromAdr(resultSet.getString("ADR3"));
-                for (String data : ArrayEntete) {
-                    System.out.print(resultSet.getString(data) + " ");
-
-                }
-                System.out.println();
+                System.out.println(i);
+                JsCaller.afficherDonateur(Double.parseDouble(resultSet.getString("Latitudes")),Double.parseDouble(resultSet.getString("Longitudes")),engine);
+                i++;
             }
             System.out.println("\tterminé\t\n");
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return arrayList;
     }
 
     public static void supprTable(){

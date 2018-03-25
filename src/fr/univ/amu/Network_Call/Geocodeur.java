@@ -25,8 +25,15 @@ public class Geocodeur {
                 Scanner scan = new Scanner(geoCodeur.openStream());
 
                 String str = new String();
-                while (scan.hasNext())
-                    str += scan.nextLine();
+                while (scan.hasNext()){
+                    try {
+                        str += scan.nextLine();
+                        Thread.sleep(4000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 scan.close();
                 JSONObject obj = new JSONObject(str);
                 // get the first result

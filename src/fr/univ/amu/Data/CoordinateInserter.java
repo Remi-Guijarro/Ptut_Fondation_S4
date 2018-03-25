@@ -13,10 +13,12 @@ public class CoordinateInserter {
         DbDonateur.AjouterColonnes("Longitudes");// Crée la colonnes Longitudes dans Donateurs
     }
 
+
     public static void getAndInsertGPS(Map<String,Address> monAdr){
         for (Map.Entry<String,Address> uneAdresse : monAdr.entrySet()){
             if(AdrChecker.CheckIfCoordonateExist(uneAdresse.getKey()) != null){
-                Coordonée myLatLong = AdrChecker.CheckIfCoordonateExist(uneAdresse.getKey());
+                System.out.println("HELLLOOOOOOO HERRREEE");
+                Coordonée myLatLong = AdrChecker.GetCoordonate(uneAdresse.getKey());
                 DbDonateur.modifyLatLong(myLatLong.getLat(),myLatLong.getLongitude(),uneAdresse.getValue());
             }else
             {
