@@ -5,7 +5,9 @@ import fr.univ.amu.Object_Structure.Coordonée;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DbDonateur {
     private static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";        // INITIALISATION DU DRIVER ACCES A LA BD
@@ -61,6 +63,17 @@ public class DbDonateur {
         }
     }
 
+    public static void modifyLatLong(Double lat,Double longitudes,ArrayList<String> elementAdresse){
+        String query = "UPDATE Donateurs SET Latitudes = "+"'"+lat+"'"+", Longitudes = "+"'"+longitudes+"'"+"WHERE ADR3 = " + "'" + elementAdresse.get(0) + "'" +
+        " AND CPOST = " + "'" + elementAdresse.get(1) + "'" + " AND VILLE = " + "'" + elementAdresse.get(2) + "'";
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static List<Coordonée> getCoordonnees() {
         try {
             String query = "SELECT ADR3, CPOST, VILLE FROM Donateurs";
@@ -77,25 +90,40 @@ public class DbDonateur {
         return new ArrayList<Coordonée>();
     }
 
-    public static /*ArrayList<String>*/ void getAdrs(){
+    public static void AjouterColonnes(String nomColonnes){
+        String query = "ALTER TABLE utilisateur ADD "+nomColonnes+" VARCHAR(300)";
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static Map<String,ArrayList<String>> getAdrs(){
+        Map <String,ArrayList<String>> mapAdresses = new HashMap<String,ArrayList<String>>();
+        ArrayList <String> listeElementAdresses =  new ArrayList<String>();
         try {
             String query = "SELECT ADR3, CPOST, VILLE FROM Donateurs";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-            ArrayList<String> adresses = new ArrayList<String>();
+
             while (resultSet.next()){
-                String adresseNormal =  resultSet.getString("ADR3")+" " + resultSet.getString("CPOST") + " " + resultSet.getString("VILLE");
+                listeElementAdresses.add(resultSet.getString("ADR3"));
+                listeElementAdresses.add(resultSet.getString("CPOST"));
+                listeElementAdresses.add(resultSet.getString("VILLE"));
                 String adresseFormaté = resultSet.getString("ADR3")+" " + resultSet.getString("CPOST") + " " + resultSet.getString("VILLE");
                 adresseFormaté = adresseFormaté.replaceAll("\\s","");
                 adresseFormaté = adresseFormaté.toUpperCase();
                 System.out.println(adresseFormaté);
-                //adresses.add(adresseFormaté);
+                mapAdresses.put(adresseFormaté,listeElementAdresses);
             }
-            //return adresses;
+            return mapAdresses;
         } catch (SQLException e) {
             e.printStackTrace();
         }
-       // return new ArrayList<String>();
+       return mapAdresses;
     }
 
     public static void trierParCP(String codePostal) {

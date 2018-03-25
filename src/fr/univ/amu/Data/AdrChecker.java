@@ -5,13 +5,13 @@ import fr.univ.amu.Object_Structure.Coordonée;
 import java.util.Map;
 
 public class AdrChecker {
-    public static void CheckIfCoordonateExist(String adresseFormaté){
+    public static Coordonée CheckIfCoordonateExist(String adresseFormaté){
        Map <String, Coordonée>  map = DbAdrToGPS.getAll();
         for (Map.Entry<String,Coordonée> e : map.entrySet()){
             if(e.getKey() == adresseFormaté){
-                System.out.println("return true");
+                return e.getValue();
             }
         }
-        System.out.println("return false");
+        return null;
     }
 }
