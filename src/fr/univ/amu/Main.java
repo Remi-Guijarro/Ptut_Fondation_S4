@@ -1,5 +1,6 @@
 package fr.univ.amu;
 
+import fr.univ.amu.Data.AdrChecker;
 import fr.univ.amu.Data.CsvReader;
 import fr.univ.amu.Data.DbAdrToGPS;
 import fr.univ.amu.Data.DbDonateur;
@@ -47,6 +48,8 @@ public class Main extends Application {
         //DbAdrToGPS.insertTuple("45 avenue du sangloer , 21600 Une ville en France","1.5678","3.7654"); //exemple d'insertion d'un tuple dans la base de données des coordonées
         //DbAdrToGPS.displayAll();                                                                       // Afficher tout les tuple de la base de coordonées
        // Geocodeur.getCoordonéeFromAdr("La Ciotat");
+       // AdrChecker.CheckIfCoordonateExist();
+        DbDonateur.getAdrs();
        launch(args);
     }
 

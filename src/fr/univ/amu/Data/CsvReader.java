@@ -44,7 +44,6 @@ public class CsvReader {
             values = line.split(",");
             DbDonateur.insertTuple(values);                 // INSERTION DE LA LIGNE DANS LA BASE DE DONÉE
         }
-        System.out.println(DbDonateur.getAdrs());
         scanner.close();
         return values;
     }

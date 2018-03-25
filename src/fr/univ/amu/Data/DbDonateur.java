@@ -77,21 +77,25 @@ public class DbDonateur {
         return new ArrayList<Coordonée>();
     }
 
-    public static ArrayList<String> getAdrs(){
+    public static /*ArrayList<String>*/ void getAdrs(){
         try {
             String query = "SELECT ADR3, CPOST, VILLE FROM Donateurs";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             ArrayList<String> adresses = new ArrayList<String>();
             while (resultSet.next()){
-                adresses.add(resultSet.getString("ADR3")+" " + resultSet.getString("CPOST") + " " + resultSet.getString("VILLE"));
+                String adresseNormal =  resultSet.getString("ADR3")+" " + resultSet.getString("CPOST") + " " + resultSet.getString("VILLE");
+                String adresseFormaté = resultSet.getString("ADR3")+" " + resultSet.getString("CPOST") + " " + resultSet.getString("VILLE");
+                adresseFormaté = adresseFormaté.replaceAll("\\s","");
+                adresseFormaté = adresseFormaté.toUpperCase();
+                System.out.println(adresseFormaté);
+                //adresses.add(adresseFormaté);
             }
-            resultSet = statement.executeQuery(query);
-            return adresses;
+            //return adresses;
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return new ArrayList<String>();
+       // return new ArrayList<String>();
     }
 
     public static void trierParCP(String codePostal) {

@@ -1,6 +1,11 @@
 package fr.univ.amu.Data;
 
+import fr.univ.amu.Object_Structure.Coordonée;
+
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DbAdrToGPS {
     private static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
@@ -42,18 +47,21 @@ public class DbAdrToGPS {
         }
     }
 
-    public static void displayAll(){
+    public static Map<String,Coordonée> getAll(){
         try {
             String query = "SELECT * FROM GeoCodeur";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
+            Map  <String, Coordonée> map = new HashMap<String,Coordonée>();
             while (resultSet.next()){
-                System.out.println(resultSet.getString("adr") + "  " + resultSet.getString("lat") + "  " + resultSet.getString("longi"));
+                map.put(resultSet.getString("adr"),new Coordonée(Double.parseDouble( resultSet.getString("lat")),Double.parseDouble(resultSet.getString("longi"))));
             }
             System.out.println("terminé");
+            return map;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
     }
 }
 
