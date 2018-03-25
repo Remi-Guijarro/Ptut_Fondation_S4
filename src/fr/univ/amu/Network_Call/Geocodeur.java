@@ -28,7 +28,7 @@ public class Geocodeur {
                 while (scan.hasNext()){
                     try {
                         str += scan.nextLine();
-                        Thread.sleep(4000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

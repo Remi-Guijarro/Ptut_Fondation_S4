@@ -16,14 +16,14 @@ public class CoordinateInserter {
 
     public static void getAndInsertGPS(Map<String,Address> monAdr){
         for (Map.Entry<String,Address> uneAdresse : monAdr.entrySet()){
-            if(AdrChecker.CheckIfCoordonateExist(uneAdresse.getKey()) != null){
+            if(AdrChecker.CheckIfCoordonateExist(uneAdresse.getKey())){
                 System.out.println("HELLLOOOOOOO HERRREEE");
                 Coordonée myLatLong = AdrChecker.GetCoordonate(uneAdresse.getKey());
                 DbDonateur.modifyLatLong(myLatLong.getLat(),myLatLong.getLongitude(),uneAdresse.getValue());
             }else
             {
+                System.out.println("je vais chercher sur internet");
                 Address ObjetAdr = uneAdresse.getValue();
-
                 Coordonée myLatLongFromServ = Geocodeur.getCoordonéeFromAdr(ObjetAdr.getAdr() + " " + ObjetAdr.getCodePostal() + " " + ObjetAdr.getVille());
                 DbDonateur.modifyLatLong(myLatLongFromServ.getLat(),myLatLongFromServ.getLongitude(),ObjetAdr);
                 DbAdrToGPS.insertTuple(uneAdresse.getKey(),myLatLongFromServ.getLat(),myLatLongFromServ.getLongitude());

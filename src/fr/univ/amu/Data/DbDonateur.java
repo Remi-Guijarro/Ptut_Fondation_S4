@@ -160,7 +160,7 @@ public class DbDonateur {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             System.out.println("\tAffichage des tuples :\t\n");
-            int i = 0;
+            int i = 1;
             while (resultSet.next()){
                 System.out.println(i);
                 JsCaller.afficherDonateur(Double.parseDouble(resultSet.getString("Latitudes")),Double.parseDouble(resultSet.getString("Longitudes")),engine);
