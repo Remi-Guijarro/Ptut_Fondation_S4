@@ -37,7 +37,7 @@ public class DbAdrToGPS {
         }
     }
 
-    public static void insertTuple(String adr,String lat,String longi){
+    public static void insertTuple(String adr,Double lat,Double longi){
         try {
             String query = "INSERT INTO GeoCodeur VALUES(" + "'" + adr + "'" + "," + "'" + lat + "'" + "," + "'" + longi + "')";
             System.out.println(query);
@@ -48,11 +48,16 @@ public class DbAdrToGPS {
     }
 
     public static Map<String,Coordonée> getAll(){
+        Map  <String, Coordonée> map = new HashMap<String,Coordonée>();
+        Statement st = null;
+        try {
+            st = connection.createStatement();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         try {
             String query = "SELECT * FROM GeoCodeur";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            Map  <String, Coordonée> map = new HashMap<String,Coordonée>();
+            ResultSet resultSet = st.executeQuery(query);
             while (resultSet.next()){
                 map.put(resultSet.getString("adr"),new Coordonée(Double.parseDouble( resultSet.getString("lat")),Double.parseDouble(resultSet.getString("longi"))));
             }
@@ -61,7 +66,21 @@ public class DbAdrToGPS {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return map;
+    }
+
+    public static void displayAll(){
+        try {
+            String query = "SELECT * FROM GeoCodeur";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()){
+                System.out.println(resultSet.getString("adr") +" " + resultSet.getString("lat") + " " + resultSet.getString("longi"));
+            }
+            System.out.println("terminé");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
 

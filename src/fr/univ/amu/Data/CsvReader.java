@@ -44,6 +44,11 @@ public class CsvReader {
             values = line.split(",");
             DbDonateur.insertTuple(values);                 // INSERTION DE LA LIGNE DANS LA BASE DE DONÉE
         }
+        DbAdrToGPS.GetConnected();                                                                    // Connexion à la base de donnée des coordonées
+        //DbAdrToGPS.createTable();
+        CoordinateInserter.CreeColonnesCoordonnée();
+        CoordinateInserter.getAndInsertGPS(DbDonateur.getAdrs());
+        DbAdrToGPS.displayAll();
         scanner.close();
         return values;
     }

@@ -41,15 +41,14 @@ public class Main extends Application {
         DbDonateur.createTable(csvReader.getEnteteFichier());                                           // Creer la table SQL a partir de l'entete du fichier
         //System.out.println(csvReader.getEnteteFichier());                                             // permet de recuperer l'entete du fichier CSV
         csvReader.readFromFile();                                                                       // inséré des tuple dans la base a partir du fichier CSV
-        DbDonateur.displayAll(csvReader.getEnteteFichier());                                            // Afficher le contenue de la base
-        DbAdrToGPS.GetConnected();                                                                    // Connexion à la base de donnée des coordonées
-        //DbAdrToGPS.createTable();                                                                     // Création de la table de Coordonéé pas besoin de relancer la ligne si tu le fait une fois la table est créer meme si tu ferme l'appli
+        DbDonateur.displayAll(csvReader.getEnteteFichier());                                            // Afficher le contenue de la base         // Création de la table de Coordonéé pas besoin de relancer la ligne si tu le fait une fois la table est créer meme si tu ferme l'appli
 
         //DbAdrToGPS.insertTuple("45 avenue du sangloer , 21600 Une ville en France","1.5678","3.7654"); //exemple d'insertion d'un tuple dans la base de données des coordonées
         //DbAdrToGPS.displayAll();                                                                       // Afficher tout les tuple de la base de coordonées
-       // Geocodeur.getCoordonéeFromAdr("La Ciotat");
-       // AdrChecker.CheckIfCoordonateExist();
-        DbDonateur.getAdrs();
+       //Geocodeur.getCoordonéeFromAdr("La Ciotat");
+       //AdrChecker.CheckIfCoordonateExist();
+       //DbDonateur.getAdrs();
+        DbAdrToGPS.displayAll();
        launch(args);
     }
 
@@ -104,6 +103,7 @@ public class Main extends Application {
 
                         for(Coordonée coordonée: DbDonateur.getCoordonnees()) {
                             afficherDonateur(coordonée.getLat(), coordonée.getLongitude(), webView.getEngine());
+                            //System.out.println(" Une Coordonée " + coordonée.getLat() + " || " + coordonée.getLongitude());
                         } // boucle for qui affiche tous les points sur la carte
                     }
                 } );

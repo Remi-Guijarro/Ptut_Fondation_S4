@@ -1,6 +1,7 @@
 package fr.univ.amu.Data;
 
 import fr.univ.amu.Network_Call.Geocodeur;
+import fr.univ.amu.Object_Structure.Address;
 import fr.univ.amu.Object_Structure.Coordonée;
 
 import java.sql.*;
@@ -63,12 +64,12 @@ public class DbDonateur {
         }
     }
 
-    public static void modifyLatLong(Double lat,Double longitudes,ArrayList<String> elementAdresse){
-        String query = "UPDATE Donateurs SET Latitudes = "+"'"+lat+"'"+", Longitudes = "+"'"+longitudes+"'"+"WHERE ADR3 = " + "'" + elementAdresse.get(0) + "'" +
-        " AND CPOST = " + "'" + elementAdresse.get(1) + "'" + " AND VILLE = " + "'" + elementAdresse.get(2) + "'";
+    public static void modifyLatLong(Double lat, Double longitudes, Address elementAdresse){
+        String query = "UPDATE Donateurs SET Latitudes = "+"'"+lat+"'"+", Longitudes = "+"'"+longitudes+"'"+"WHERE ADR3 = " + "'" + elementAdresse.getAdr() + "'" +
+        " AND CPOST = " + "'" + elementAdresse.getCodePostal() + "'" + " AND VILLE = " + "'" + elementAdresse.getVille() + "'";
         try {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+            statement.execute(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -76,12 +77,12 @@ public class DbDonateur {
 
     public static List<Coordonée> getCoordonnees() {
         try {
-            String query = "SELECT ADR3, CPOST, VILLE FROM Donateurs";
+            String query = "SELECT Latitudes, Longitudes FROM Donateurs";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             List<Coordonée> lesCoordonnées = new ArrayList<Coordonée>();
             while (resultSet.next()){
-                 lesCoordonnées.add(Geocodeur.getCoordonéeFromAdr(resultSet.getString("ADR3") + " " + resultSet.getString("CPOST") + " " + resultSet.getString("VILLE")));
+                 lesCoordonnées.add(new Coordonée(Double.parseDouble(resultSet.getString("Latitudes")), Double.parseDouble(resultSet.getString("Longitudes"))));
             }
             return lesCoordonnées;
         } catch (SQLException e) {
@@ -91,33 +92,31 @@ public class DbDonateur {
     }
 
     public static void AjouterColonnes(String nomColonnes){
-        String query = "ALTER TABLE utilisateur ADD "+nomColonnes+" VARCHAR(300)";
+        String query = "ALTER TABLE Donateurs ADD "+nomColonnes+" VARCHAR(300)";
         try {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+            statement.execute(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
     }
 
-    public static Map<String,ArrayList<String>> getAdrs(){
-        Map <String,ArrayList<String>> mapAdresses = new HashMap<String,ArrayList<String>>();
-        ArrayList <String> listeElementAdresses =  new ArrayList<String>();
+    public static Map<String, Address> getAdrs(){
+        Map <String,Address>mapAdresses = new HashMap<String,Address>();
+        Address address = null;
         try {
             String query = "SELECT ADR3, CPOST, VILLE FROM Donateurs";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
 
             while (resultSet.next()){
-                listeElementAdresses.add(resultSet.getString("ADR3"));
-                listeElementAdresses.add(resultSet.getString("CPOST"));
-                listeElementAdresses.add(resultSet.getString("VILLE"));
+               address = new Address(resultSet.getString("ADR3"),resultSet.getString("CPOST"),resultSet.getString("VILLE"));
+
                 String adresseFormaté = resultSet.getString("ADR3")+" " + resultSet.getString("CPOST") + " " + resultSet.getString("VILLE");
                 adresseFormaté = adresseFormaté.replaceAll("\\s","");
                 adresseFormaté = adresseFormaté.toUpperCase();
-                System.out.println(adresseFormaté);
-                mapAdresses.put(adresseFormaté,listeElementAdresses);
+                mapAdresses.put(adresseFormaté,address);
             }
             return mapAdresses;
         } catch (SQLException e) {
