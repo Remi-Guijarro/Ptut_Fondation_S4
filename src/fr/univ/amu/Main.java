@@ -7,6 +7,7 @@ import fr.univ.amu.Data.DbDonateur;
 import fr.univ.amu.Displayed_Object.Carte;
 import fr.univ.amu.Network_Call.Geocodeur;
 import fr.univ.amu.Object_Structure.Coordonée;
+import fr.univ.amu.Object_Structure.JsCaller;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -52,9 +53,11 @@ public class Main extends Application {
        launch(args);
     }
 
-    public void removeDonateur( WebEngine engine) {
+
+    public void removeDonateur(WebEngine engine) {
         engine.executeScript("document.removeMarker()");
     }
+
 
     public AnchorPane setMap(){ // Fonction qui creé la map et la fixe a l'IHM
         final WebView webView = new WebView();
@@ -331,37 +334,22 @@ public class Main extends Application {
         VBox commands = new VBox(30, textRegion, region, textFiltre, filtreAge, filtreDon, filtreDept, validerAll, hboxErreur);
         HBox horizon = new HBox(commands);
 
-       /* validerAll.setOnAction(new EventHandler<ActionEvent>() {
+       validerAll.setOnAction(new EventHandler<ActionEvent>() {
+
             @Override
             public void handle(ActionEvent event) {
                 String codePostal = dept.getText();
                 if(2 == codePostal.length() || codePostal.length() == 5) {
                     erreur.setText("Code postal sélectionné\n" + codePostal);
+                    webView.getEngine().reload();
+                    webengine.executeScript("document.removeMarker");
 
-                    DbDonateur.trierParCP(codePostal);
-                    webView.getEngine().getLoadWorker().stateProperty().addListener( // EXECUTER UN SCRIPT UNIQUEMENT SI LA WEBVIEW A FINI DE CHARGER SINON IL NE DETECTE PAS LA FONCTION
-                            new ChangeListener<Worker.State>() {
-                                @Override
-                                public void changed(
-                                        ObservableValue<? extends Worker.State> observable,
-                                        Worker.State oldValue, Worker.State newValue ) {
-
-                                    if( newValue != Worker.State.SUCCEEDED ) {
-                                        return;
-                                    }
-                                    removeDonateur(webView.getEngine());
-                                    for(Coordonée coordonée: DbDonateur.getCoordonnees()) {
-                                        afficherDonateur(coordonée.getLat(), coordonée.getLongitude(), webView.getEngine());
-                                    } // boucle for qui affiche tous les points sur la carte
-                                    System.out.println("Supprimer les markeurs et afficher les markeurs corrects");
-                                }
-                            } );
                 } else {
-                    erreur.setText("Le code postal doit avoir \nune taille de 2 ou 5 caractères !\nEx: 04 ou 13100");
+                    erreur.setText("Code postal invalide !\nEx: 04 ou 13100");
                 }
 
             }
-        });*/
+        });
 
 
         commands.setStyle("-fx-background-color: #0d3a6d");
